@@ -1,13 +1,15 @@
 <p align="center">
-  <img src="assets/logo.svg" alt="Atlas Signal" width="120">
+  <img src="docs/img/portada.png" alt="Atlas Signal — cifrado y esteganografía en el navegador, por el Lic. Germán Cárdenas" width="100%">
 </p>
 
-<h1 align="center">ATLAS SIGNAL</h1>
-
 <p align="center">
-  <b>Cifrado y esteganografía en tu navegador.</b><br>
-  Oculta archivos y mensajes cifrados dentro de imágenes y audio.<br>
-  <sub>por el Lic. Germán Cárdenas</sub>
+  <a href="https://licgermancardenas-crypto.github.io/ATLAS-SIGNAL/"><b>🌐 Abrir Atlas Signal</b></a>
+  &nbsp;·&nbsp;
+  <a href="#capturas">Capturas</a>
+  &nbsp;·&nbsp;
+  <a href="#cómo-usarlo">Cómo usarlo</a>
+  &nbsp;·&nbsp;
+  <a href="#cómo-funciona">Cómo funciona</a>
 </p>
 
 ---
@@ -30,6 +32,26 @@ Como el titán Atlas sostiene el mundo, Atlas Signal sostiene tu información de
 - ✉️ **Cifrado de texto suelto**: convierte un mensaje en un bloque `AS1.…` para enviarlo por cualquier medio.
 - 🏠 **100% local**: nada se sube a internet. Funciona sin conexión y no necesita instalación.
 - 📜 **Historial opcional** guardado solo en tu navegador, sin contraseñas ni contenido.
+
+## Capturas
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/img/ocultar.png" alt="Ocultar: portador, contenido y contraseña"><p align="center"><b>Ocultar</b>: elige el portador, el contenido y la contraseña</p></td>
+    <td width="50%"><img src="docs/img/resultado.png" alt="Resultado de la ocultación"><p align="center"><b>Resultado</b>: descarga el archivo con el secreto</p></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/img/extraer.png" alt="Extraer un mensaje oculto"><p align="center"><b>Extraer</b>: recupera el mensaje con la contraseña</p></td>
+    <td width="50%"><img src="docs/img/texto.png" alt="Cifrar texto sin portador"><p align="center"><b>Cifrar texto</b>: mensajes cifrados para enviar por cualquier medio</p></td>
+  </tr>
+</table>
+
+<p align="center">
+  <img src="docs/img/movil.png" alt="Atlas Signal en el móvil: ocultar" width="260">
+  &nbsp;&nbsp;
+  <img src="docs/img/movil-extraer.png" alt="Atlas Signal en el móvil: extraer" width="260">
+  <br><sub>Diseño adaptado a móviles</sub>
+</p>
 
 ## Cómo usarlo
 

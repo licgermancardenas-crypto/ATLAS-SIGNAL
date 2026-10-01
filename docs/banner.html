@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Atlas Signal — portada</title>
+<!-- Fuente de la portada del README. Para regenerarla:
+     chrome --headless=new --window-size=1280,640 --force-device-scale-factor=2 --hide-scrollbars --screenshot=portada.png docs/banner.html -->
+<style>
+  :root { --bg:#0b0f1a; --gold:#f5b841; --gold-2:#e09a1c; --cyan:#5eead4; --text:#e8ecf5; --text-2:#b4bdd3; --muted:#7e89a6; --border:#232c45; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1280px; height: 640px; overflow: hidden; }
+  body {
+    position: relative;
+    background:
+      radial-gradient(700px 520px at 88% 30%, rgba(245,184,65,.16), transparent 65%),
+      radial-gradient(600px 500px at 8% 100%, rgba(94,234,212,.10), transparent 60%),
+      var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+  }
+  .grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(94,234,212,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(94,234,212,.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(600px 420px at 25% 50%, #000 30%, transparent 75%);
+  }
+  .rings { position: absolute; left: -150px; top: 50%; transform: translateY(-50%); width: 760px; height: 760px; }
+  .rings circle { fill: none; stroke: var(--cyan); }
+
+  .left { position: absolute; left: 72px; top: 0; bottom: 0; width: 520px; display: flex; flex-direction: column; justify-content: center; }
+  .logo { width: 92px; height: 92px; margin-bottom: 22px; filter: drop-shadow(0 6px 24px rgba(245,184,65,.25)); }
+  .eyebrow { font-size: 15px; font-weight: 700; letter-spacing: .32em; color: var(--gold); text-transform: uppercase; margin-bottom: 12px; }
+  h1 { font-size: 60px; line-height: 1; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; margin-bottom: 22px; white-space: nowrap; }
+  h1 b { color: var(--gold); font-weight: 700; }
+  .tagline { font-size: 22px; line-height: 1.45; color: var(--text-2); max-width: 450px; margin-bottom: 28px; }
+  .chips { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 34px; }
+  .chip { padding: 8px 16px; border-radius: 999px; font-size: 15px; font-weight: 600; letter-spacing: .03em; border: 1px solid rgba(245,184,65,.35); background: rgba(245,184,65,.10); color: var(--gold); }
+  .chip.c { border-color: rgba(94,234,212,.35); background: rgba(94,234,212,.10); color: var(--cyan); }
+  .sig { display: flex; align-items: center; gap: 14px; font-size: 17px; color: var(--text-2); letter-spacing: .04em; }
+  .sig::before { content: ""; width: 40px; height: 2px; background: linear-gradient(90deg, var(--gold), transparent); }
+  .sig b { color: var(--text); font-weight: 600; }
+
+  .stage { position: absolute; left: 690px; top: 70px; width: 820px; height: 520px; perspective: 1800px; }
+  .window {
+    position: absolute; left: 0; top: 0; width: 800px; border-radius: 14px; overflow: hidden;
+    border: 1px solid #2c3757; background: #0e1322;
+    box-shadow: 0 40px 90px rgba(0,0,0,.6), 0 0 0 1px rgba(245,184,65,.08), 0 0 80px rgba(245,184,65,.10);
+    transform: rotateY(-14deg) rotateX(4deg); transform-origin: left center;
+  }
+  .bar { height: 34px; display: flex; align-items: center; gap: 8px; padding: 0 14px; background: #121829; border-bottom: 1px solid var(--border); }
+  .bar i { width: 11px; height: 11px; border-radius: 50%; background: #2c3757; }
+  .bar i:nth-child(1) { background: #f87171; } .bar i:nth-child(2) { background: var(--gold); } .bar i:nth-child(3) { background: #34d399; }
+  .bar span { margin-left: 14px; font: 12px "Cascadia Code", Consolas, monospace; color: var(--muted); }
+  .window img { display: block; width: 100%; }
+
+  .phone {
+    position: absolute; left: -60px; top: 112px; width: 210px; height: 430px; border-radius: 34px; padding: 9px;
+    background: linear-gradient(160deg, #2a3350, #121829); border: 1px solid #3a4668;
+    box-shadow: 0 30px 70px rgba(0,0,0,.7), 0 0 40px rgba(94,234,212,.12);
+  }
+  .phone .screen { width: 100%; height: 100%; border-radius: 26px; overflow: hidden; background: #0b0f1a; }
+  .phone img { width: 100%; display: block; }
+</style>
+</head>
+<body>
+  <div class="grid"></div>
+  <svg class="rings" viewBox="0 0 760 760" aria-hidden="true">
+    <circle cx="380" cy="380" r="120" opacity=".14"/><circle cx="380" cy="380" r="200" opacity=".10"/>
+    <circle cx="380" cy="380" r="280" opacity=".07"/><circle cx="380" cy="380" r="360" opacity=".05"/>
+  </svg>
+
+  <section class="left">
+    <img class="logo" src="../assets/logo.svg" alt="">
+    <div class="eyebrow">Cifrado · Esteganografía</div>
+    <h1>Atlas <b>Signal</b></h1>
+    <p class="tagline">Oculta archivos y mensajes cifrados dentro de imágenes y audio, a plena vista.</p>
+    <div class="chips">
+      <span class="chip">AES-256-GCM</span>
+      <span class="chip c">100% local</span>
+      <span class="chip">Imágenes y WAV</span>
+    </div>
+    <div class="sig">por el&nbsp;<b>Lic. Germán Cárdenas</b></div>
+  </section>
+
+  <div class="stage">
+    <div class="window">
+      <div class="bar"><i></i><i></i><i></i><span>atlas-signal · ocultar</span></div>
+      <img src="img/ocultar.png" alt="">
+    </div>
+    <div class="phone"><div class="screen"><img src="img/movil-extraer.png" alt=""></div></div>
+  </div>
+</body>
+</html>
