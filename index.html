@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Atlas Signal</title>
+  <meta name="description" content="Atlas Signal — cifra y oculta archivos y mensajes dentro de imágenes y audio. Todo se procesa en tu navegador.">
+  <meta name="author" content="Lic. Germán Cárdenas">
+  <meta name="theme-color" content="#0B0F1A">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-hide" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></symbol>
+      <symbol id="i-extract" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></symbol>
+      <symbol id="i-text" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+      <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></symbol>
+      <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></symbol>
+      <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+      <symbol id="i-dice" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="15" r="1"/><circle cx="15" cy="9" r="1"/><circle cx="9" cy="15" r="1"/></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></symbol>
+      <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5"/></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+      <symbol id="i-wave" viewBox="0 0 24 24"><path d="M2 12h2l2-6 3 12 3-9 3 6 2-3h5"/></symbol>
+    </defs>
+  </svg>
+
+  <header class="topbar">
+    <a class="brand" href="#ocultar" aria-label="Atlas Signal, inicio">
+      <img src="assets/logo.svg" alt="" width="40" height="40">
+      <span class="brand-text">
+        <span class="brand-name">Atlas <b>Signal</b></span>
+        <span class="brand-tag">Cifrado · Esteganografía</span>
+      </span>
+    </a>
+    <div class="topbar-right">
+      <span class="badge-local" title="Ningún archivo ni contraseña sale de este equipo"><span class="dot"></span>100% local</span>
+      <span class="author">Lic. Germán Cárdenas</span>
+    </div>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" aria-label="Secciones">
+      <button class="nav-item active" data-view="ocultar"><svg><use href="#i-hide"/></svg><span>Ocultar</span></button>
+      <button class="nav-item" data-view="extraer"><svg><use href="#i-extract"/></svg><span>Extraer</span></button>
+      <button class="nav-item" data-view="texto"><svg><use href="#i-text"/></svg><span>Cifrar texto</span></button>
+      <button class="nav-item" data-view="historial"><svg><use href="#i-history"/></svg><span>Historial</span></button>
+      <button class="nav-item" data-view="acerca"><svg><use href="#i-info"/></svg><span>Acerca de</span></button>
+      <div class="sidebar-foot">v1.0.0</div>
+    </nav>
+
+    <main>
+      <!-- ===================== OCULTAR ===================== -->
+      <section class="view active" id="view-ocultar" aria-labelledby="h-ocultar">
+        <header class="view-head">
+          <p class="eyebrow">Proteger y ocultar</p>
+          <h1 id="h-ocultar">Esconde un secreto a plena vista</h1>
+          <p class="lead">Tu archivo o mensaje se cifra con tu contraseña y se dispersa dentro de una imagen o un audio. Nadie notará la diferencia.</p>
+        </header>
+
+        <div class="grid-2">
+          <article class="card">
+            <h2 class="step"><span>1</span>Portador</h2>
+            <label class="drop" id="coverDrop">
+              <input type="file" id="coverInput" accept=".png,.bmp,.jpg,.jpeg,.webp,.gif,.wav,image/*,audio/wav,audio/x-wav">
+              <div class="drop-empty">
+                <svg class="drop-icon"><use href="#i-upload"/></svg>
+                <strong>Arrastra una imagen o un audio</strong>
+                <span>PNG · BMP · JPG · WEBP · WAV</span>
+                <svg class="wave" viewBox="0 0 200 24" preserveAspectRatio="none"><path d="M0 12 Q 12.5 0 25 12 T 50 12 T 75 12 T 100 12 T 125 12 T 150 12 T 175 12 T 200 12"/></svg>
+              </div>
+              <div class="drop-filled" hidden>
+                <div class="preview" id="coverPreview"></div>
+                <div class="file-meta">
+                  <strong id="coverName"></strong>
+                  <span id="coverInfo"></span>
+                  <span class="link-like">Cambiar archivo</span>
+                </div>
+              </div>
+            </label>
+            <p class="hint" id="coverHint" hidden></p>
+          </article>
+
+          <article class="card">
+            <h2 class="step"><span>2</span>Contenido a ocultar</h2>
+            <div class="segmented" role="tablist" id="payloadMode">
+              <button role="tab" aria-selected="true" data-mode="file">Archivo</button>
+              <button role="tab" aria-selected="false" data-mode="text">Mensaje</button>
+            </div>
+            <div id="payloadFileBox">
+              <label class="drop drop-sm" id="payloadDrop">
+                <input type="file" id="payloadInput">
+                <div class="drop-empty">
+                  <svg class="drop-icon"><use href="#i-file"/></svg>
+                  <strong>Cualquier archivo</strong>
+                  <span>PDF, documentos, fotos, ZIP…</span>
+                </div>
+                <div class="drop-filled" hidden>
+                  <svg class="file-glyph"><use href="#i-file"/></svg>
+                  <div class="file-meta">
+                    <strong id="payloadName"></strong>
+                    <span id="payloadInfo"></span>
+                    <span class="link-like">Cambiar archivo</span>
+                  </div>
+                </div>
+              </label>
+            </div>
+            <div id="payloadTextBox" hidden>
+              <textarea id="payloadText" rows="6" placeholder="Escribe aquí el mensaje secreto…"></textarea>
+              <div class="counter" id="payloadTextCount">0 caracteres</div>
+            </div>
+          </article>
+        </div>
+
+        <article class="card">
+          <h2 class="step"><span>3</span>Protección</h2>
+          <div class="grid-2 tight">
+            <div>
+              <label class="field-label" for="hidePw">Contraseña</label>
+              <div class="pw" data-pw>
+                <input type="password" id="hidePw" autocomplete="new-password" spellcheck="false" placeholder="Mínimo 8 caracteres">
+                <button type="button" class="icon-btn" data-toggle title="Mostrar u ocultar"><svg><use href="#i-eye"/></svg></button>
+                <button type="button" class="icon-btn" data-generate title="Generar contraseña segura"><svg><use href="#i-dice"/></svg></button>
+                <button type="button" class="icon-btn" data-copy title="Copiar contraseña"><svg><use href="#i-copy"/></svg></button>
+              </div>
+              <div class="strength" id="hideStrength"><i></i><i></i><i></i><i></i><span></span></div>
+            </div>
+            <div>
+              <label class="field-label" for="hidePw2">Confirmar contraseña</label>
+              <div class="pw">
+                <input type="password" id="hidePw2" autocomplete="new-password" spellcheck="false" placeholder="Repite la contraseña">
+              </div>
+              <p class="hint" id="pwMatch"></p>
+            </div>
+          </div>
+
+          <div class="mode-row">
+            <span class="field-label">Modo de ocultación</span>
+            <div class="segmented" id="depthMode">
+              <button aria-selected="true" data-depth="1" title="Modifica 1 bit por canal: más difícil de detectar">Sigiloso · 1 bit</button>
+              <button aria-selected="false" data-depth="2" title="Modifica 2 bits por canal: doble de capacidad">Capacidad · 2 bits</button>
+            </div>
+          </div>
+
+          <div class="capacity">
+            <div class="capacity-head"><span>Capacidad del portador</span><span id="capText">—</span></div>
+            <div class="bar"><div id="capBar"></div></div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary" id="hideBtn" disabled><svg><use href="#i-hide"/></svg>Ocultar</button>
+          </div>
+        </article>
+
+        <article class="card result" id="hideResult" hidden>
+          <div class="result-preview" id="hideResultPreview"></div>
+          <div class="result-body">
+            <p class="eyebrow ok">Listo</p>
+            <h2>Secreto oculto con éxito</h2>
+            <dl class="meta-list" id="hideResultMeta"></dl>
+            <div class="actions left">
+              <a class="btn btn-primary" id="hideDownload" download><svg><use href="#i-download"/></svg>Descargar archivo</a>
+            </div>
+            <p class="notice">Guarda tu contraseña: sin ella el contenido es irrecuperable. Al compartir el archivo, envíalo como <b>documento</b> o dentro de un ZIP; WhatsApp, Telegram o Instagram recomprimen las imágenes y audios y destruyen el contenido oculto.</p>
+          </div>
+        </article>
+      </section>
+
+      <!-- ===================== EXTRAER ===================== -->
+      <section class="view" id="view-extraer" aria-labelledby="h-extraer">
+        <header class="view-head">
+          <p class="eyebrow">Revelar</p>
+          <h1 id="h-extraer">Recupera lo que está oculto</h1>
+          <p class="lead">Carga el PNG o WAV generado por Atlas Signal e introduce la contraseña.</p>
+        </header>
+
+        <article class="card">
+          <div class="grid-2 tight">
+            <label class="drop" id="stegoDrop">
+              <input type="file" id="stegoInput" accept=".png,.wav,image/png,audio/wav,audio/x-wav">
+              <div class="drop-empty">
+                <svg class="drop-icon"><use href="#i-upload"/></svg>
+                <strong>Arrastra el archivo con el secreto</strong>
+                <span>PNG · WAV</span>
+              </div>
+              <div class="drop-filled" hidden>
+                <div class="preview" id="stegoPreview"></div>
+                <div class="file-meta">
+                  <strong id="stegoName"></strong>
+                  <span id="stegoInfo"></span>
+                  <span class="link-like">Cambiar archivo</span>
+                </div>
+              </div>
+            </label>
+            <div class="stack">
+              <div>
+                <label class="field-label" for="extractPw">Contraseña</label>
+                <div class="pw" data-pw>
+                  <input type="password" id="extractPw" autocomplete="current-password" spellcheck="false" placeholder="La contraseña usada al ocultar">
+                  <button type="button" class="icon-btn" data-toggle title="Mostrar u ocultar"><svg><use href="#i-eye"/></svg></button>
+                </div>
+              </div>
+              <div class="actions left">
+                <button class="btn btn-primary" id="extractBtn" disabled><svg><use href="#i-extract"/></svg>Extraer</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card result" id="extractResult" hidden>
+          <div class="result-body wide">
+            <p class="eyebrow ok">Contenido recuperado</p>
+            <div id="extractText" hidden>
+              <textarea id="extractTextOut" rows="8" readonly></textarea>
+              <div class="actions left"><button class="btn" id="extractCopy"><svg><use href="#i-copy"/></svg>Copiar mensaje</button></div>
+            </div>
+            <div id="extractFile" hidden>
+              <div class="file-card">
+                <svg class="file-glyph"><use href="#i-file"/></svg>
+                <div class="file-meta"><strong id="extractFileName"></strong><span id="extractFileInfo"></span></div>
+                <a class="btn btn-primary" id="extractDownload" download><svg><use href="#i-download"/></svg>Descargar</a>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- ===================== TEXTO ===================== -->
+      <section class="view" id="view-texto" aria-labelledby="h-texto">
+        <header class="view-head">
+          <p class="eyebrow">Sin portador</p>
+          <h1 id="h-texto">Cifra y descifra mensajes</h1>
+          <p class="lead">Convierte un mensaje en un bloque cifrado que puedes enviar por cualquier medio. Solo quien conozca la contraseña podrá leerlo.</p>
+        </header>
+        <article class="card">
+          <label class="field-label" for="txtIn">Mensaje o texto cifrado (AS1.…)</label>
+          <textarea id="txtIn" rows="6" placeholder="Escribe un mensaje para cifrar o pega un texto AS1.… para descifrar"></textarea>
+          <div class="grid-2 tight top-gap">
+            <div>
+              <label class="field-label" for="txtPw">Contraseña</label>
+              <div class="pw" data-pw>
+                <input type="password" id="txtPw" autocomplete="off" spellcheck="false" placeholder="Mínimo 8 caracteres">
+                <button type="button" class="icon-btn" data-toggle title="Mostrar u ocultar"><svg><use href="#i-eye"/></svg></button>
+                <button type="button" class="icon-btn" data-generate title="Generar contraseña segura"><svg><use href="#i-dice"/></svg></button>
+                <button type="button" class="icon-btn" data-copy title="Copiar contraseña"><svg><use href="#i-copy"/></svg></button>
+              </div>
+            </div>
+            <div class="actions left end">
+              <button class="btn btn-primary" id="txtEncrypt"><svg><use href="#i-text"/></svg>Cifrar</button>
+              <button class="btn" id="txtDecrypt"><svg><use href="#i-extract"/></svg>Descifrar</button>
+            </div>
+          </div>
+          <div id="txtOutBox" class="top-gap" hidden>
+            <label class="field-label" for="txtOut" id="txtOutLabel">Resultado</label>
+            <textarea id="txtOut" rows="6" readonly class="mono"></textarea>
+            <div class="actions left"><button class="btn" id="txtCopy"><svg><use href="#i-copy"/></svg>Copiar resultado</button></div>
+          </div>
+        </article>
+      </section>
+
+      <!-- ===================== HISTORIAL ===================== -->
+      <section class="view" id="view-historial" aria-labelledby="h-historial">
+        <header class="view-head">
+          <p class="eyebrow">Registro local</p>
+          <h1 id="h-historial">Historial de operaciones</h1>
+          <p class="lead">Se guarda solo en este navegador y nunca incluye contraseñas ni contenido. Está desactivado por defecto.</p>
+        </header>
+        <article class="card">
+          <div class="history-bar">
+            <label class="switch"><input type="checkbox" id="histToggle"><span></span>Registrar operaciones</label>
+            <button class="btn btn-ghost" id="histClear"><svg><use href="#i-x"/></svg>Borrar historial</button>
+          </div>
+          <div class="table-wrap">
+            <table class="history">
+              <thead><tr><th>Fecha</th><th>Operación</th><th>Portador</th><th>Contenido</th><th>Resultado</th></tr></thead>
+              <tbody id="histBody"></tbody>
+            </table>
+          </div>
+          <p class="empty" id="histEmpty">Todavía no hay operaciones registradas.</p>
+        </article>
+      </section>
+
+      <!-- ===================== ACERCA ===================== -->
+      <section class="view" id="view-acerca" aria-labelledby="h-acerca">
+        <header class="view-head">
+          <p class="eyebrow">Atlas Signal v1.0.0</p>
+          <h1 id="h-acerca">Como el titán que sostiene el mundo</h1>
+          <p class="lead">Atlas Signal carga tu secreto dentro de la señal de una imagen o un audio: invisible para el ojo y el oído, ilegible sin tu contraseña.</p>
+        </header>
+
+        <div class="grid-3">
+          <article class="card feature"><span class="num">01</span><h3>Cifrado fuerte</h3><p>AES-256-GCM con una clave derivada de tu contraseña mediante PBKDF2 (600.000 iteraciones). Cualquier alteración se detecta.</p></article>
+          <article class="card feature"><span class="num">02</span><h3>Dispersión con clave</h3><p>Los bits cifrados se reparten en posiciones pseudoaleatorias que solo tu contraseña conoce. Sin cabeceras ni firmas visibles.</p></article>
+          <article class="card feature"><span class="num">03</span><h3>100% en tu equipo</h3><p>Todo ocurre en tu navegador. Ningún archivo, mensaje ni contraseña se envía a internet. Funciona incluso sin conexión.</p></article>
+        </div>
+
+        <article class="card prose">
+          <h2>Buenas prácticas</h2>
+          <ul>
+            <li><b>Usa contraseñas largas</b>. El botón <svg class="inline"><use href="#i-dice"/></svg> genera una de 20 caracteres.</li>
+            <li><b>Comparte la contraseña por otro canal</b>, nunca junto al archivo.</li>
+            <li><b>No dejes que recompriman el archivo.</b> Envíalo como documento o dentro de un ZIP. Cualquier edición, recorte o conversión destruye el contenido oculto.</li>
+            <li><b>Elige portadores con textura</b>: fotografías con detalle y audio con sonido continuo disimulan mejor los cambios que fondos planos o silencios.</li>
+            <li><b>El modo Sigiloso</b> (1 bit) es más difícil de detectar; usa <b>Capacidad</b> (2 bits) solo si el contenido no cabe.</li>
+          </ul>
+          <h2>Formatos</h2>
+          <p>Portadores de entrada: PNG, BMP, JPG, WEBP, GIF y WAV (PCM 8/16/24/32 bits o flotante). Las imágenes se guardan siempre como PNG sin pérdida y los audios como WAV.</p>
+          <h2>Uso responsable</h2>
+          <p>Atlas Signal es una herramienta de privacidad y aprendizaje. Úsala respetando las leyes aplicables.</p>
+          <p class="signature">Desarrollado por el <b>Lic. Germán Cárdenas</b> · © 2026 · Licencia MIT</p>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <footer class="footer">Atlas Signal · Lic. Germán Cárdenas · © 2026</footer>
+
+  <div class="overlay" id="overlay" hidden>
+    <div class="overlay-card" role="status" aria-live="polite">
+      <svg class="ring" viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" class="ring-bg"/><circle cx="60" cy="60" r="52" class="ring-fg" id="ringFg"/></svg>
+      <div class="overlay-pct" id="overlayPct">0%</div>
+      <div class="overlay-msg" id="overlayMsg">Procesando…</div>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script src="js/vendor/pako.min.js"></script>
+  <script src="js/vendor/UPNG.js"></script>
+  <script src="js/core/crypto.js"></script>
+  <script src="js/core/stego.js"></script>
+  <script src="js/core/carriers.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

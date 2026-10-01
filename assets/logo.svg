@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <title>Atlas Signal</title>
+  <!-- ondas de señal -->
+  <path d="M48 9a22 22 0 0 1 6 15" stroke="#5EEAD4" stroke-width="2.2" stroke-linecap="round" opacity=".55"/>
+  <path d="M52 4a28 28 0 0 1 8 20" stroke="#5EEAD4" stroke-width="2.2" stroke-linecap="round" opacity=".3"/>
+  <!-- esfera -->
+  <circle cx="32" cy="24" r="15" stroke="#5EEAD4" stroke-width="2.4"/>
+  <ellipse cx="32" cy="24" rx="6.5" ry="15" stroke="#5EEAD4" stroke-width="1.6" opacity=".7"/>
+  <path d="M17.5 19h29M17.5 29h29" stroke="#5EEAD4" stroke-width="1.6" opacity=".7"/>
+  <!-- titán: hombros y brazos que sostienen -->
+  <path d="M14 60c1-9 4-15 9-18M50 60c-1-9-4-15-9-18" stroke="#F5B841" stroke-width="3" stroke-linecap="round"/>
+  <path d="M23 42c-4-3-6-8-6.5-13M41 42c4-3 6-8 6.5-13" stroke="#F5B841" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="32" cy="45" r="3.2" fill="#F5B841"/>
+</svg>
