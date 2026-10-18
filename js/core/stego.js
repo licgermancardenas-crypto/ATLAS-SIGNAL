@@ -56,7 +56,7 @@
 
   /**
    * carrier = { buf: Uint8Array, count: número de posiciones, index(s) → índice en buf }
-   * depth   = bits menos significativos usados por posición (1 o 2)
+   * depth   = bits menos significativos usados por posición (1, 2 o 4)
    */
   function capacity(carrier, depth) {
     return Math.max(0, Math.floor((carrier.count * depth) / 8) - HEADER_LEN);
@@ -113,6 +113,7 @@
     if (ct.length > cap) {
       const err = new Error(`El contenido cifrado (${ct.length} bytes) no cabe en el portador (capacidad ${cap} bytes).`);
       err.code = "CAPACITY";
+      err.needed = ct.length;
       throw err;
     }
     progress(0.25);
@@ -130,7 +131,7 @@
   }
 
   /** Busca y descifra contenido oculto. Prueba las profundidades indicadas. */
-  async function reveal(carrier, password, depths = [1, 2], onProgress) {
+  async function reveal(carrier, password, depths = [1, 2, 4], onProgress) {
     const C = root.AtlasCrypto;
     const layout = await C.layoutKey(password);
     const permute = makePermutation(carrier.count, layout);

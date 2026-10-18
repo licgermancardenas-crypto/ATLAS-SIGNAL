@@ -58,8 +58,8 @@ test("permutación es biyectiva", () => {
   }
 });
 
-test("archivo en imagen PNG (1 y 2 bits) → extraer", async () => {
-  for (const depth of [1, 2]) {
+test("archivo en imagen PNG (1, 2 y 4 bits) → extraer", async () => {
+  for (const depth of [1, 2, 4]) {
     const w = 120, h = 90, rgba = noisyImage(w, h);
     const original = rgba.slice();
     const data = te.encode("contenido secreto ".repeat(40));
@@ -72,7 +72,7 @@ test("archivo en imagen PNG (1 y 2 bits) → extraer", async () => {
 
     const png = K.encodePNG(rgba, w, h);
     const back = K.decodePNG(png.buffer);
-    const { inner: out, depth: found } = await S.reveal(K.imageCarrier(back.rgba), "Clave-Muy-Segura-2026");
+    const { inner: out, depth: found } = await S.reveal(K.imageCarrier(back.rgba), "Clave-Muy-Segura-2026", [1, 2, 4]);
     assert.strictEqual(found, depth);
     const item = await C.unpack(out);
     assert.strictEqual(item.name, "plan.txt");

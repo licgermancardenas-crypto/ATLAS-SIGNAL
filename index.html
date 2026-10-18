@@ -143,12 +143,14 @@
             <div class="segmented" id="depthMode">
               <button aria-selected="true" data-depth="1" title="Modifica 1 bit por canal: más difícil de detectar">Sigiloso · 1 bit</button>
               <button aria-selected="false" data-depth="2" title="Modifica 2 bits por canal: doble de capacidad">Capacidad · 2 bits</button>
+              <button aria-selected="false" data-depth="4" title="Modifica 4 bits por canal: cuádruple de capacidad; puede notarse un leve granulado en zonas lisas">Máximo · 4 bits</button>
             </div>
           </div>
 
           <div class="capacity">
             <div class="capacity-head"><span>Capacidad del portador</span><span id="capText">—</span></div>
             <div class="bar"><div id="capBar"></div></div>
+            <p class="hint bad" id="capHint" hidden></p>
           </div>
 
           <div class="actions">

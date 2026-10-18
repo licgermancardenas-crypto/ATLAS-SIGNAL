@@ -28,7 +28,8 @@ Como el titán Atlas sostiene el mundo, Atlas Signal sostiene tu información de
 - 🎧 **Audio**: WAV PCM de 8, 16, 24 o 32 bits y WAV en coma flotante.
 - 📝 **Mensajes o archivos** de cualquier tipo; el nombre del archivo viaja **dentro** del cifrado.
 - 🗜️ **Compresión automática** antes de cifrar, para que quepa más contenido.
-- 🕶️ **Dos modos**: *Sigiloso* (1 bit, más difícil de detectar) o *Capacidad* (2 bits, el doble de espacio).
+- 🕶️ **Tres modos**: *Sigiloso* (1 bit, más difícil de detectar), *Capacidad* (2 bits, el doble de espacio) o *Máximo* (4 bits, cuatro veces más; puede notarse un leve granulado en zonas lisas).
+- 🔍 **Ampliación automática**: si el contenido no cabe en la imagen, se amplía (hasta 64 MP) para que quepa. Se ve igual, pero el PNG resultante pesa más.
 - ✉️ **Cifrado de texto suelto**: convierte un mensaje en un bloque `AS1.…` para enviarlo por cualquier medio.
 - 🏠 **100% local**: nada se sube a internet. Funciona sin conexión y no necesita instalación.
 - 📜 **Historial opcional** guardado solo en tu navegador, sin contraseñas ni contenido.

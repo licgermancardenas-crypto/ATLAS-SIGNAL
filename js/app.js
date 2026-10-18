@@ -199,7 +199,81 @@
 
   ["hidePw", "hidePw2"].forEach((id) => $(id).addEventListener("input", () => { updateStrength(); updateHideState(); }));
 
+  const DEPTH_LABEL = { 1: "Sigiloso · 1 bit", 2: "Capacidad · 2 bits", 4: "Máximo · 4 bits" };
+
   function carrierOf(item) { return item.kind === "audio" ? item.wav.carrier : item.carrier; }
+
+  /** Qué portador haría falta para `needBytes` de contenido (estimación). */
+  function carrierAdvice(needBytes) {
+    const bits = (needBytes + S.HEADER_LEN) * 8;
+    const mp = (d) => { const x = bits / (3 * d) / 1e6; return x < 10 ? (Math.ceil(x * 10) / 10).toLocaleString("es") : String(Math.ceil(x)); };
+    const w = hide.cover && hide.cover.kind === "audio" ? hide.cover.wav : null;
+    const perSecond = w ? w.sampleRate * w.channels : 44100 * 2;
+    const secs = Math.ceil(bits / hide.depth / perSecond);
+    const dur = secs < 60 ? `${secs} s` : `${Math.ceil(secs / 60)} min`;
+    const wavDesc = w ? `un WAV como este de al menos ${dur}` : `un WAV estéreo de al menos ${dur}`;
+    const img = `una imagen de al menos ${mp(hide.depth)} MP` + (hide.depth < 4 ? ` (o ${mp(4)} MP en modo Máximo)` : "");
+    return `Necesitas ${img}, o ${wavDesc}.`;
+  }
+
+  // ---- Ampliación automática de imágenes que se quedan cortas ----
+
+  const MAX_ENLARGED_PIXELS = 64e6;   // 64 MP: por encima, el navegador puede quedarse sin memoria
+  const MAX_SIDE = 16384;
+  const GCM_TAG = 16;
+
+  /** Posiciones necesarias para ocultar `innerLen` bytes empaquetados. */
+  function slotsNeeded(innerLen, depth) {
+    return Math.ceil(((innerLen + GCM_TAG + S.HEADER_LEN) * 8) / depth);
+  }
+
+  /** Tamaño aproximado al que habría que ampliar la imagen, o null si no hace falta. */
+  function enlargeTarget(cover, needSlots) {
+    const have = cover.carrier.count;
+    if (have >= needSlots) return null;
+    if (!have) return { width: Infinity, height: Infinity, scale: Infinity };
+    const scale = Math.sqrt(needSlots / have) * 1.02;
+    return { width: Math.ceil(cover.width * scale), height: Math.ceil(cover.height * scale), scale };
+  }
+
+  function fitsLimits(t) { return t.width * t.height <= MAX_ENLARGED_PIXELS && t.width <= MAX_SIDE && t.height <= MAX_SIDE; }
+
+  function tooBigError(innerLen) {
+    const err = new Error(`No cabe ni ampliando la imagen al máximo (${MAX_ENLARGED_PIXELS / 1e6} MP).`);
+    err.code = "CAPACITY"; err.needed = innerLen + GCM_TAG;
+    return err;
+  }
+
+  /** Amplía la imagen con suavizado hasta que quepan `needSlots` posiciones. */
+  async function enlargeImage(cover, needSlots, innerLen) {
+    const src = document.createElement("canvas");
+    src.width = cover.width; src.height = cover.height;
+    const clamped = new Uint8ClampedArray(cover.rgba.buffer, cover.rgba.byteOffset, cover.rgba.byteLength);
+    src.getContext("2d").putImageData(new ImageData(clamped, cover.width, cover.height), 0, 0);
+
+    let t = enlargeTarget(cover, needSlots);
+    for (let attempt = 0; attempt < 4; attempt++) {
+      if (!fitsLimits(t)) throw tooBigError(innerLen);
+      let rgba;
+      try {
+        const dst = document.createElement("canvas");
+        dst.width = t.width; dst.height = t.height;
+        const ctx = dst.getContext("2d", { willReadFrequently: true });
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(src, 0, 0, t.width, t.height);
+        rgba = new Uint8Array(ctx.getImageData(0, 0, t.width, t.height).data.buffer);
+      } catch (_) {
+        throw new Error(`Este navegador no puede manejar una imagen de ${t.width} × ${t.height} px. Prueba en un ordenador con Chrome o Firefox, o usa el modo Máximo.`);
+      }
+      const carrier = K.imageCarrier(rgba);
+      if (carrier.count >= needSlots) return { rgba, width: t.width, height: t.height, carrier };
+      // Los bordes semitransparentes no cuentan como capacidad: ampliar un poco más.
+      const s = t.scale * 1.1;
+      t = { width: Math.ceil(cover.width * s), height: Math.ceil(cover.height * s), scale: s };
+    }
+    throw tooBigError(innerLen);
+  }
 
   function payloadEstimate() {
     if (hide.mode === "file") return hide.file ? hide.file.size + te.encode(hide.file.name).length + hide.file.type.length + 40 : 0;
@@ -217,6 +291,8 @@
     const cap = hide.cover ? S.capacity(carrierOf(hide.cover), hide.depth) : 0;
     const need = payloadEstimate();
     const bar = $("capBar");
+    const capHint = $("capHint");
+    capHint.hidden = true;
     if (!hide.cover) { $("capText").textContent = "Carga un portador"; bar.style.width = "0"; }
     else {
       const ratio = cap ? need / cap : 1;
@@ -225,6 +301,17 @@
       $("capText").textContent = need
         ? `${formatBytes(need)} de ${formatBytes(cap)}${ratio > 1 ? " · no cabe (se intentará comprimir)" : ""}`
         : `Hasta ${formatBytes(cap)}`;
+      if (ratio > 1 && need) {
+        const t = hide.cover.kind === "image" ? enlargeTarget(hide.cover, slotsNeeded(need, hide.depth)) : null;
+        if (t && fitsLimits(t)) {
+          capHint.className = "hint";
+          capHint.textContent = `Al ocultar, la imagen se ampliará a unos ${t.width} × ${t.height} px para que quepa (se verá igual, pero el PNG pesará más). Si el contenido se comprime bien, puede no hacer falta.`;
+        } else {
+          capHint.className = "hint bad";
+          capHint.textContent = (t ? `No cabe ni ampliando la imagen al máximo (${MAX_ENLARGED_PIXELS / 1e6} MP). ` : "") + carrierAdvice(need);
+        }
+        capHint.hidden = false;
+      }
     }
     const hasPayload = hide.mode === "file" ? !!hide.file : $("payloadText").value.length > 0;
     $("hideBtn").disabled = !(hide.cover && hasPayload && pw.length >= MIN_PW && pw === pw2);
@@ -245,8 +332,18 @@
       const inner = await C.pack(item);
 
       // Trabajar sobre una copia para poder repetir la operación con el mismo portador.
-      let carrier, work;
-      if (cover.kind === "image") { work = cover.rgba.slice(); carrier = K.imageCarrier(work); }
+      let carrier, work, outW = cover.width, outH = cover.height, enlarged = false;
+      if (cover.kind === "image") {
+        const needSlots = slotsNeeded(inner.length, hide.depth);
+        if (cover.carrier.count < needSlots) {
+          overlay.msg("Ampliando la imagen para que quepa…"); await paint();
+          const big = await enlargeImage(cover, needSlots, inner.length);
+          work = big.rgba; carrier = big.carrier; outW = big.width; outH = big.height; enlarged = true;
+          overlay.msg("Cifrando contenido…");
+        } else {
+          work = cover.rgba.slice(); carrier = K.imageCarrier(work);
+        }
+      }
       else { work = cover.bytes.slice(); carrier = K.parseWAV(work).carrier; }
 
       const stats = await S.hide(carrier, inner, password, hide.depth, (f) => {
@@ -257,7 +354,7 @@
       overlay.msg("Generando archivo…"); overlay.set(0.92); await paint();
       let blob, outName;
       if (cover.kind === "image") {
-        blob = new Blob([K.encodePNG(work, cover.width, cover.height)], { type: "image/png" });
+        blob = new Blob([K.encodePNG(work, outW, outH)], { type: "image/png" });
         outName = `${baseName(cover.name)}.png`;
       } else {
         blob = new Blob([work], { type: "audio/wav" });
@@ -278,14 +375,15 @@
       const used = Math.round((stats.bytesHidden / stats.capacity) * 100);
       $("hideResultMeta").innerHTML = "";
       [["Archivo", outName], ["Tamaño", formatBytes(blob.size)], ["Contenido", item.kind === C.KIND.FILE ? item.name : "Mensaje de texto"],
-       ["Ocupado", `${formatBytes(stats.bytesHidden)} (${used}% de la capacidad)`], ["Modo", hide.depth === 1 ? "Sigiloso · 1 bit" : "Capacidad · 2 bits"]]
+       ["Ocupado", `${formatBytes(stats.bytesHidden)} (${used}% de la capacidad)`], ["Modo", DEPTH_LABEL[hide.depth]],
+       ...(enlarged ? [["Ampliada", `${cover.width} × ${cover.height} → ${outW} × ${outH} px`]] : [])]
         .forEach(([k, v]) => { const dt = document.createElement("dt"); dt.textContent = k; const dd = document.createElement("dd"); dd.textContent = v; $("hideResultMeta").append(dt, dd); });
       $("hideResult").hidden = false;
       $("hideResult").scrollIntoView({ behavior: "smooth", block: "nearest" });
       addHistory({ op: "hide", carrier: cover.name, content: item.kind === C.KIND.FILE ? item.name : "Mensaje", result: `${outName} · ${formatBytes(blob.size)}` });
     } catch (e) {
       console.error(e);
-      toast(e.code === "CAPACITY" ? `${e.message} Usa un portador más grande o el modo Capacidad.` : (e.message || "Error al ocultar."), "error");
+      toast(e.code === "CAPACITY" ? `${e.message} ${carrierAdvice(e.needed)}` : (e.message || "Error al ocultar."), "error");
     } finally {
       overlay.hide();
     }
@@ -325,7 +423,7 @@
     overlay.show("Buscando contenido oculto…"); overlay.set(0.1); await paint();
     try {
       const carrier = carrierOf(item);
-      const { inner } = await S.reveal(carrier, $("extractPw").value, [1, 2], (f) => overlay.set(0.2 + f * 0.7));
+      const { inner } = await S.reveal(carrier, $("extractPw").value, [1, 2, 4], (f) => overlay.set(0.2 + f * 0.7));
       overlay.msg("Descifrando…"); overlay.set(0.95);
       const payload = await C.unpack(inner);
       overlay.set(1);
